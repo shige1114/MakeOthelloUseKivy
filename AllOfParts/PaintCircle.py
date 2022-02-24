@@ -4,8 +4,10 @@ __author__ = "HAMAGUCHI SHIGENAGA"
 __date__ = 2022/2/22
 __ver__ = "0.0.0"
 
+from tkinter import Widget
 from kivy.graphics import Color,Line,Ellipse
 from BoardOfOthello import OthelloBoard
+
 class PaintCircle:
     def __init__(self,widget,widget_size,):
         self.othello_board = OthelloBoard()
@@ -17,13 +19,12 @@ class PaintCircle:
 
         self.circle_size = (self.circle_size_x,self.circle_size_y)
 
+        self.window.on_touch_down
 
-    def paint(self,turn,mouse_pos=None,list_pos=None):
-        if(mouse_pos!=None):pos = self.processing_pos(mouse_pos)
-        else:
-            x,y = list_pos
-            pos = self.othello_board.board_pos[x][y]
-        print(pos)
+    def paint(self,turn,list_pos=None):
+        x,y = list_pos
+        print(x,y)
+        pos = self.othello_board.board_pos[y][x]
         with self.window.canvas :
             if(turn):self.paint_white(pos)
             else:self.paint_black(pos)
@@ -33,16 +34,17 @@ class PaintCircle:
         
         Ellipse(pos=pos,size=self.circle_size)
 
-    def paint_black(self,pos):
-        
+    def paint_black(self,pos): 
         Color(1,1,1)
 
         Ellipse(pos=pos,size=self.circle_size)
 
+    
     def processing_pos(self,pos):
         x,y = pos
         pos_x = x//self.circle_size_x
         pos_y = y//self.circle_size_y 
         
         return (self.othello_board.board_pos[int(pos_x)][int(pos_y)])
-        
+
+     
