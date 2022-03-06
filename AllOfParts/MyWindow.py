@@ -1,10 +1,10 @@
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.button import Button
-from TextWidget import TextWidget
-from BoardOfOthello import OthelloBoard
-from PaintOthello import PaintOthello
+from AllOfParts.Widget.TextWidget import TextWidget
+from AllOfParts.Model.BoardOfOthello import OthelloBoard
+from AllOfParts.Paint.PaintOthello import PaintOthello
 from kivy.core.window import Window
-from PaintCircle import PaintCircle
+from AllOfParts.Paint.PaintCircle import PaintCircle
 
 class MyWindow(FloatLayout):
     def __init__(self, **kwargs):
@@ -45,13 +45,14 @@ class MyWindow(FloatLayout):
             
             if True in is_sandwitch:
                 x,y = pos
-                self.paint_circle.paint(list_pos=(x,y),turn=self.othello_board.turn)
+                list_pos = self.othello_board.board_pos[y][x]
+                self.paint_circle.paint(list_pos=list_pos,turn=self.othello_board.turn)
                 self.othello_board.board[y][x] = self.othello_board.turn
                 self.othello_board.change_sandwitch(is_sandwitch,pos)
                 for y in range(8):
                     for x in range(8):
                         if(self.othello_board.board[y][x]==self.othello_board.turn):
-                            self.paint_circle.paint(list_pos=(x,y),turn=self.othello_board.board[y][x])
+                            self.paint_circle.paint(list_pos=self.othello_board.board_pos[y][x],turn=self.othello_board.board[y][x])
                 is_sandwitch = []
                 
                 self.othello_board.turn_update()
@@ -93,10 +94,10 @@ class MyWindow(FloatLayout):
             for x in range(8):
                 self.paint_circle.clear_circle(self.othello_board.board_pos[y][x])
         
-        self.paint_circle.paint(list_pos=(3,3),turn = self.othello_board.board[3][3])
-        self.paint_circle.paint(list_pos=(4,4),turn = self.othello_board.board[4][4])
-        self.paint_circle.paint(list_pos=(3,4),turn = self.othello_board.board[3][4])
-        self.paint_circle.paint(list_pos=(4,3),turn= self.othello_board.board[4][3])
+        self.paint_circle.paint(list_pos=self.othello_board.board_pos[3][3],turn = self.othello_board.board[3][3])
+        self.paint_circle.paint(list_pos=self.othello_board.board_pos[4][4],turn = self.othello_board.board[4][4])
+        self.paint_circle.paint(list_pos=self.othello_board.board_pos[3][4],turn = self.othello_board.board[3][4])
+        self.paint_circle.paint(list_pos=self.othello_board.board_pos[4][3],turn= self.othello_board.board[4][3])
     
         
 
