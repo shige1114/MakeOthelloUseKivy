@@ -36,3 +36,8 @@ class PaintCircle:
         with self.window.canvas:
             Color(0.5,0.2,0.1,1)
             Ellipse(pos=pos,size=self.circle_size)
+
+    def board_update(self,**args):
+        for y in range(len(args["board"])):
+            for x in range(len(args["board"][y])):
+                if(args["board"][y][x]==args["turn"]):self.paint(list_pos=args["board_pos"][y][x],turn=args["turn"])
