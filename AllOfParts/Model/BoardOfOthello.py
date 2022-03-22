@@ -12,7 +12,7 @@ class OthelloBoard:
         self.player_1 = Player(True)
         self.player_2 = Player(False)
         self.turn = True
-
+        self.remaining_moves = 64
         self.winner = None
         
         self.size = Window.size
@@ -27,6 +27,7 @@ class OthelloBoard:
     def turn_update(self):
         if(self.turn):self.turn=False
         else:self.turn=True
+        self.remaining_moves-=1
 
     def make_board_pos(self,pos_list):
         a_mas_x=self.Othello_x/8+0.5
