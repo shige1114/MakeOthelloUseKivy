@@ -1,12 +1,15 @@
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.button import Button
+from AllOfParts.Widget.ImageWidget import ImageWidget
 from AllOfParts.Widget.TextWidget import TextWidget
 from AllOfParts.Model.BoardOfOthello import OthelloBoard
 from AllOfParts.Paint.PaintOthello import PaintOthello
 from kivy.core.window import Window
 from AllOfParts.Paint.PaintCircle import PaintCircle
 from ReversiCpu.Cpu import Cpu
-from time import sleep
+import time
+from ControllMV.MV import MV
+
 class MyWindow(FloatLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -14,6 +17,7 @@ class MyWindow(FloatLayout):
         self.othello_cpu = Cpu(turn=False)
         self.window_size = Window.size
         self.is_first_touch = True
+        self.mv = MV()
         self.start = False
         self.othello_board_x = self.window_size[0]/3*2
         self.othello_board_y = self.window_size[1]
@@ -28,7 +32,7 @@ class MyWindow(FloatLayout):
         self.start_button = Button(text="Start",size=(self.start_button_x,self.start_button_y),size_hint=(None, None), pos=(self.othello_board_x,0))
         self.text_widget = TextWidget(text="Start!",widget_size=self.text_widget_size,size=(self.start_button_x,self.start_button_y),size_hint=(None, None),pos=(self.othello_board_x,self.start_button_y))
         self.cpu_button = Button(text="CPU",size=(self.start_button_x,self.start_button_y),size_hint=(None, None), pos=(self.othello_board_x+self.start_button_x,0))
-
+        #self.image_widget = ImageWidget(size=(self.start_button_x,self.start_button_y),size_hint=(None, None), pos=(self.othello_board_x,0))
         self.add_widget(self.board,)
         self.add_widget(self.cpu_button)
         self.add_widget(self.start_button)
@@ -48,16 +52,18 @@ class MyWindow(FloatLayout):
         if self.start:
                 
             if True in is_sandwitch and not self.is_puted:
+                self.mv.make_sound(turn=self.othello_board.turn)
                 self.is_puted = True
                 x,y = pos
-                list_pos = self.othello_board.board_pos[y][x]
-                    
+                list_pos = self.othello_board.board_pos[y][x]     
+               
                 self.othello_board.board[y][x] = self.othello_board.turn
                 self.othello_board.change_sandwitch(is_sandwitch,pos)
                 self.paint_circle.board_update(board_pos=self.othello_board.board_pos,turn=self.othello_board.turn,board=self.othello_board.board)
                 
+
                 self.othello_board.turn_update()
-                self.text_widget.print_turn(self.othello_board.turn)
+                #self.text_widget.print_turn(self.othello_board.turn)
                 self.is_first_touch=False
 
         return super().on_touch_down(touch)
@@ -116,9 +122,12 @@ class MyWindow(FloatLayout):
         self.cpu = not self.cpu
 
     def cpu_faze(self):
-        
+        start_time = time.time()
         if(self.cpu and self.start):
-            score,cpu_pos = self.othello_cpu.max_algha_bata_function(turn=self.othello_cpu.turn,board=self.othello_board.board,n=4)
+            
+            if self.othello_board.remaining_moves>8:score,cpu_pos = self.othello_cpu.max_algha_bata_function(turn=self.othello_cpu.turn,board=self.othello_board.board,n=3,remaining_moves=self.othello_board.remaining_moves,start_time=start_time)
+            else:score,cpu_pos = self.othello_cpu.max_algha_bata_function(turn=self.othello_cpu.turn,board=self.othello_board.board,n=self.othello_board.remaining_moves,remaining_moves=self.othello_board.remaining_moves,start_time=start_time)
+            
             if type(cpu_pos)!=type(list()):return 0
             x,y = cpu_pos
             is_sandwitch = self.othello_board.judge_place(cpu_pos)

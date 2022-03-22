@@ -4,11 +4,25 @@ __author__ = "HAMAGUCHI SHIGENAGA"
 __date__ = 2022/3/6
 __ver__ = "0.0.0"
 from copy import deepcopy
+from math import trunc
 from sysconfig import is_python_build
-from time import sleep
+import time
+from turtle import shape, shapesize
 from AllOfParts.Model.BoardOfOthello import OthelloBoard
+ESCAPE_TIME = 0.5
 class Cpu:
-
+   
+    class ValueToRecordScore:
+        def __init__(self) -> None:
+            self.all_score = 0
+            self.pos_score = 0
+            self.shape_score = 0
+            self.first_blood=10
+            pass
+        def total_score(self):
+            
+            pass
+        
     def __init__(self,turn) -> None:
         self.othello_board = OthelloBoard()
         self.turn = turn
@@ -16,41 +30,92 @@ class Cpu:
         pass
 
     def static_merit_function(self,**args):
-        score=0
+        """
+        return args
+        """
+
+        
+        my_score = self.ValueToRecordScore()
+        oppo_score = self.ValueToRecordScore()
+
+        shape_score = 10
         score_of_board = [
-            [120,-20,20,5,5,20,-20,120],
-            [-20,-40,-5,-5,-5,-5,-40,-20],
+            [45,-20,20,5,5,20,-20,45],
+            [-20,-30,-5,-5,-5,-5,-30,-20],
             [20,-5,15,3,3,15,-5,20],
             [5,-5,3,3,3,3,-5,5],
-            [120,-20,20,5,5,20,-20,120],
-            [-20,-40,-5,-5,-5,-5,-40,-20],
-            [20,-5,15,3,3,15,-5,20],
             [5,-5,3,3,3,3,-5,5],
+            [20,-5,15,3,3,15,-5,20],
+            [-20,-30,-5,-5,-5,-5,-30,-20],
+            [45,-20,20,5,5,20,-20,45],
             ]
         courners = [[7,7],[0,0],[0,7],[7,0]]
+        args["dif_turn"]= not self.turn
+
+        for y in range(8):
+            for x in range(8):
+                if(args["board"][y][x]==None):continue
+                if args["board"][y][x] == self.turn:my_score.pos_score+=score_of_board[y][x]
+                if args["board"][y][x] != self.turn:oppo_score.pos_score += score_of_board[y][x]
+
         for couner in courners:
             x,y = couner
-            if(args["board"][y][x]!=args["turn"]):continue
-            else:score+=score_of_board[y][x]
             for vec in self.vec:
                 mv_x,mv_y = x,y
                 for _ in range(3):
-                    
                     mv_x+=vec[0]
                     mv_y+=vec[1]
                     if(mv_x>=0 and mv_x<8):
                         if(mv_y>=0 and mv_y<8):
-                            if(args["board"][mv_y][mv_x]!=args["turn"]):break
-                        
-
-                else:score+=10
+                            if(args["board"][mv_y][mv_x]!=self.turn):break
+                else:oppo_score.shape_score+=shape_score
+        for couner in courners:
+            x,y = couner
+            for vec in self.vec:
+                mv_x,mv_y = x,y
+                for _ in range(3):
+                    mv_x+=vec[0]
+                    mv_y+=vec[1]
+                    if(mv_x>=0 and mv_x<8):
+                        if(mv_y>=0 and mv_y<8):
+                            if(args["board"][mv_y][mv_x]!= args["dif_turn"]):break
+                else:my_score.shape_score+=shape_score
+                
         put_pos_inf = self.all_put_pos(board=args["board"],turn=args["turn"])
-        if put_pos_inf["num"]!=None:score += score+0.1*put_pos_inf["num"]
-        return score
+        if put_pos_inf["num"]!=None:my_score.all_score = 0.5*my_score.pos_score + 0.1*put_pos_inf["num"] + my_score.shape_score*0.5
+        else:my_score.all_score = 0.5*my_score.pos_score + my_score.shape_score*0.5
+        put_pos_inf = self.all_put_pos(board=args["board"],turn=not args["turn"])
+        if put_pos_inf["num"]!=None:oppo_score.all_score = 0.5*oppo_score.pos_score + 0.1*put_pos_inf["num"] + oppo_score.shape_score*0.5
+        else:oppo_score.all_score = 0.5*oppo_score.pos_score + oppo_score.shape_score*0.5
+        
+        return my_score.all_score-oppo_score.all_score
         pass
 
-    def max_algha_bata_function(self,turn,n=3,board=None,):
-        if(n==0):return self.static_merit_function(board=board,turn = turn),0
+    def maximize_number_function(self,**args):
+
+        score = 0
+        num = 0
+        
+        for y in range(8):
+            for x in range(8):
+                if args["board"][y][x]==self.turn:num+=1
+        
+        put_pos_inf = self.all_put_pos(board=args["board"],turn=not self.turn)
+        if put_pos_inf["num"]!=None:score -= 0.5*put_pos_inf["num"]
+
+        score += num
+        return score
+
+        pass
+
+    def max_algha_bata_function(self,turn,n=3,board=None,algha = None,remaining_moves=None,start_time = None):
+        end_time = time.time()
+        global ESCAPE_TIME
+        if remaining_moves<=7:ESCAPE_TIME=0.3
+        if(n==0 or end_time-start_time>=ESCAPE_TIME):
+            if(remaining_moves>=7):return self.static_merit_function(board=board,turn = turn),0,
+            else:return self.maximize_number_function(board=board,turn = turn),0,
+            
         c_board = deepcopy(board)
         inf_of_put = self.all_put_pos(board=c_board,turn=turn)
         best_pos = None
@@ -63,20 +128,34 @@ class Cpu:
         for cp_y in range(len(can_pos)):
             for cp_x in range(len(can_pos[cp_y])):
                 if can_pos[cp_y][cp_x]:
-                    
+                    start_time = time.time()
                     sanded_board=self.change_sand(c_board,all_pos[cp_y][cp_x],pos=[cp_x,cp_y],turn=turn)
-                    score,p = self.min_algha_bata_function(n=n-1,turn=not turn,board=sanded_board)
-
+                    score,p,= self.min_algha_bata_function(n=n-1,turn=not turn,board=sanded_board,beta=max_score,remaining_moves=remaining_moves,start_time=start_time)
+                 
+                    
+                    """
+                    if algha!=None:
+                        if algha<score:
+                            return algha,0
+                    """
+                    
+                 
+                    
                     
                     if(score>max_score):
                         best_pos = [cp_x,cp_y]
                         max_score=score
                     
-        return max_score,best_pos
+        return max_score,best_pos,
         pass
 
-    def min_algha_bata_function(self,turn,n=3,board=None,):
-        if(n==0):return self.static_merit_function(board=board,turn = turn),0
+    def min_algha_bata_function(self,turn,n=3,board=None,beta=None,remaining_moves=None,start_time = None):
+        
+        end_time = time.time()
+        if(n==0 or end_time-start_time>=ESCAPE_TIME):
+            
+            if(remaining_moves<=12):return self.static_merit_function(board=board,turn = turn),0,
+            else:return self.maximize_number_function(board=board,turn = turn),0,
         c_board = deepcopy(board)
         inf_of_put = self.all_put_pos(board=c_board,turn=turn)
         min_pos = None
@@ -88,16 +167,24 @@ class Cpu:
         for cp_y in range(len(can_pos)):
             for cp_x in range(len(can_pos[cp_y])):
                 if not can_pos[cp_y][cp_x]:continue
-                
+                start_time = time.time()
                 sanded_board=self.change_sand(c_board,all_pos[cp_y][cp_x],pos=[cp_x,cp_y],turn=turn)
-                score,p = self.max_algha_bata_function(n=n-1,turn=not turn,board=sanded_board)
-
+                score,p, = self.max_algha_bata_function(n=n-1,turn=not turn,board=sanded_board,algha=min_score,remaining_moves=remaining_moves,start_time=start_time)
+                """
+                if beta!=None:
+                    if beta>score:
+                        return beta,0
+                """
+                
+               
+                
+                
                 if(score!=None):
                     if(score<min_score):
                         min_score=score
                         min_pos=[cp_x,cp_y]
 
-        return min_score,min_pos
+        return min_score,min_pos,
         pass
 
     def all_put_pos(self,turn,board):
