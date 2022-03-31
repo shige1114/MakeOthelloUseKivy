@@ -9,7 +9,7 @@ from sysconfig import is_python_build
 import time
 from turtle import shape, shapesize
 from AllOfParts.Model.BoardOfOthello import OthelloBoard
-ESCAPE_TIME = 000.4
+ESCAPE_TIME = 2
 REMAINING_MOVES = 6
 RIMIT_SVM = 4
 class Cpu:
@@ -29,6 +29,39 @@ class Cpu:
         self.othello_board = OthelloBoard()
         self.turn = turn
         self.vec = [[0,1],[1,0],[1,1],[-1,0],[0,-1],[-1,-1],[1,-1],[-1,1]]
+        pass
+
+    def main_algha_beta_func(self,turn,n=3,board=None,algha = None,remaining_moves=None,start_time = None):
+        c_board = deepcopy(board)
+        inf_of_put = self.all_put_pos(board=c_board,turn=turn)
+        best_pos = None
+        max_score = -999999
+        can_pos = inf_of_put["can_put"]
+        all_pos = inf_of_put["put_poss"]
+        beta = None
+        if(not inf_of_put["is_put"]):return self.static_merit_function(board=board,turn = turn),0
+        for cp_y in range(len(can_pos)):
+            for cp_x in range(len(can_pos[cp_y])):
+                if not can_pos[cp_y][cp_x]:continue   
+                start_time = time.time()
+                sanded_board=self.change_sand(c_board,all_pos[cp_y][cp_x],pos=[cp_x,cp_y],turn=turn)
+                
+                score,p, = self.min_algha_bata_function(n=n-1,turn=not turn,board=sanded_board,beta=beta,remaining_moves=remaining_moves,start_time=start_time)
+                
+                if(score>max_score):
+                    best_pos = [cp_x,cp_y]
+                    max_score=score
+                    print(score)
+         
+                
+                if beta ==None or beta>score:
+                    beta=score
+                    
+        return max_score,best_pos,
+        pass
+
+
+
         pass
 
     def static_merit_function(self,**args):
@@ -112,7 +145,7 @@ class Cpu:
         pass
 
     def max_algha_bata_function(self,turn,n=3,board=None,algha = None,remaining_moves=None,start_time = None):
-        end_time = 0
+        end_time = time.time()
         global ESCAPE_TIME
         if remaining_moves<=REMAINING_MOVES:ESCAPE_TIME=0.3
         if(n==0 or end_time-start_time>=ESCAPE_TIME):
@@ -133,16 +166,13 @@ class Cpu:
                 if can_pos[cp_y][cp_x]:
                     
                     sanded_board=self.change_sand(c_board,all_pos[cp_y][cp_x],pos=[cp_x,cp_y],turn=turn)
-                    if n>=RIMIT_SVM:
-                        start_time=time.time()
+                    
                         
                     score,p,= self.min_algha_bata_function(n=n-1,turn=not turn,board=sanded_board,beta=max_score,remaining_moves=remaining_moves,start_time=start_time)
                  
-                    """
-                      if algha!=None:
+                    if algha!=None:
                         if algha<score:
                             return algha,0
-                    """
                   
                     
                     
@@ -159,7 +189,7 @@ class Cpu:
 
     def min_algha_bata_function(self,turn,n=3,board=None,beta=None,remaining_moves=None,start_time = None):
         
-        end_time = 0
+        end_time = time.time()
         if(n==0 or end_time-start_time>=ESCAPE_TIME):
             
             if(remaining_moves<=REMAINING_MOVES):return self.static_merit_function(board=board,turn = turn),0,
@@ -175,16 +205,13 @@ class Cpu:
         for cp_y in range(len(can_pos)):
             for cp_x in range(len(can_pos[cp_y])):
                 if not can_pos[cp_y][cp_x]:continue
-                start_time = time.time()
+                
                 sanded_board=self.change_sand(c_board,all_pos[cp_y][cp_x],pos=[cp_x,cp_y],turn=turn)
                 score,p, = self.max_algha_bata_function(n=n-1,turn=not turn,board=sanded_board,algha=min_score,remaining_moves=remaining_moves,start_time=start_time)
-                if n>=RIMIT_SVM:start_time=time.time()
                 
-                """
                 if beta!=None:
                     if beta>score:
                         return beta,0
-                """
                 
 
                 
