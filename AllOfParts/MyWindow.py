@@ -10,7 +10,9 @@ from ReversiCpu.Cpu import Cpu
 import time
 from AllOfParts.Widget.ImageWidget import ImageWidget
 from kivy.clock import Clock
-Window.size = (1200,900)
+Window.size = (900,700)
+
+REMAINING_MOVES = 8
 class MyWindow(FloatLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -134,7 +136,7 @@ class MyWindow(FloatLayout):
         start_time = time.time()
         if(self.cpu and self.start):
             
-            if self.othello_board.remaining_moves>8:score,cpu_pos = self.othello_cpu.main_algha_beta_func(turn=self.othello_cpu.turn,board=self.othello_board.board,n=4,remaining_moves=self.othello_board.remaining_moves,start_time=start_time)
+            if self.othello_board.remaining_moves>REMAINING_MOVES: score,cpu_pos = self.othello_cpu.main_algha_beta_func(turn=self.othello_cpu.turn,board=self.othello_board.board,n=4,remaining_moves=self.othello_board.remaining_moves,start_time=start_time)
             else:score,cpu_pos = self.othello_cpu.main_algha_beta_func(turn=self.othello_cpu.turn,board=self.othello_board.board,n=self.othello_board.remaining_moves,remaining_moves=self.othello_board.remaining_moves,start_time=start_time)
             
             if type(cpu_pos)!=type(list()):return 0
