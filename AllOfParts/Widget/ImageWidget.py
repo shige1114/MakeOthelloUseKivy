@@ -11,8 +11,11 @@ class ImageWidget(Image):
         self.image_list["Test"] = self.procing_path("test.png")
         self.image_list["Start"]=None
         self.add_dict(file="WhiteDefault")
+        self.add_dict(file="BlackDefault")
+        self.add_dict(file="Start")
+        self.source = self.image_list["Start"]
         self.image_list["Black"]=None
-        self.image_list["BlackDefault"] = self.image_list["WhiteDefault"]
+        
         self.image_list["BlackWinner"]=None
         self.image_list["WhiteWinner"]=None
 

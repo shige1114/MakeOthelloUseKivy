@@ -50,13 +50,15 @@ class MyWindow(FloatLayout):
         
 
     def on_touch_down(self, touch):
-        
+        """
+        画面をクリックされた際の処理を行う。
+
+        """
         pos = self.processing_pos(touch.pos)
         is_sandwitch = self.othello_board.judge_place(pos)
                     
         
         if self.start:
-                
             if True in is_sandwitch and not self.is_puted:
                 
                 self.is_puted = True
@@ -72,10 +74,6 @@ class MyWindow(FloatLayout):
                 #self.text_widget.print_turn(self.othello_board.turn)
                 self.image_widget.change_turn_image(self.othello_board.turn)
                 self.is_first_touch=False
-                
-                #CHANGE
-                
-        
                 
         return super().on_touch_down(touch)
     
