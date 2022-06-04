@@ -1,4 +1,4 @@
-from curses.ascii import ispunct
+
 from kivy.core.window import Window
 from AllOfParts.Model.Player import Player
 
@@ -27,7 +27,12 @@ class OthelloBoard:
     def turn_update(self):
         if(self.turn):self.turn=False
         else:self.turn=True
-        self.remaining_moves-=1
+        num = 0
+        for y in range(8):
+            for x in range(8):
+                if self.board[y][x]==None:num+=1
+        self.remaining_moves = num
+
 
     def make_board_pos(self,pos_list):
         a_mas_x=self.Othello_x/8+0.5
@@ -95,6 +100,7 @@ class OthelloBoard:
         self.player_2 = Player(False)
         self.turn = True
         self.winner = None
+        self.remaining_moves = 64
 
 
     def mvn(self,x,y,vec,is_first):
