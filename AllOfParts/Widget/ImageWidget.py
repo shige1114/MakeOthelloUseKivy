@@ -8,7 +8,7 @@ class ImageWidget(Image):
         super().__init__(**kwargs)
         self.size = widget_size
         self.image_list = dict()
-        self.image_list["Test"] = self.procing_path("test.png")
+        
         self.image_list["Start"]=None
         self.add_dict(file="WhiteDefault")
         self.add_dict(file="BlackDefault")
@@ -16,8 +16,8 @@ class ImageWidget(Image):
         self.source = self.image_list["Start"]
         self.image_list["Black"]=None
         
-        self.image_list["BlackWinner"]=None
-        self.image_list["WhiteWinner"]=None
+        self.add_dict("BlackWin")
+        self.add_dict("WhiteWin")
 
        
         

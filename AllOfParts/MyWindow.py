@@ -92,7 +92,7 @@ class MyWindow(FloatLayout):
                 if not self.othello_board.judge_put_circle():
                     self.othello_board.winner=self.othello_board.judge_winner()
                     #self.text_widget.print_winner(self.othello_board.winner)
-                    self.image_widget.change_turn_image(turn = self.othello_board.turn)
+                    self.image_widget.winner_image(turn = self.othello_board.turn)
                     return 0
             if not self.cpu:break
             if(self.othello_board.turn!=self.othello_cpu.turn):break
@@ -155,7 +155,7 @@ class MyWindow(FloatLayout):
             if not self.othello_board.judge_put_circle():
                 self.othello_board.winner=self.othello_board.judge_winner()
                 #self.text_widget.print_winner(self.othello_board.winner)
-                self.image_widget.change_turn_image(turn = self.othello_board.turn)
+                self.image_widget.winner_image(turn = self.othello_board.turn)
 
     def reset_faze(self,instance):
         self.start = False
